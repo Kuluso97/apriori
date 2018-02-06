@@ -8,7 +8,7 @@ import time
 from collections import defaultdict
 from itertools import combinations
 
-def getTransactionListAndItemSet(dataSet):
+def loadData(dataSet):
 	inputFile = open(dataSet)
 	transactionList = []
 	itemDict = defaultdict(int)
@@ -19,20 +19,12 @@ def getTransactionListAndItemSet(dataSet):
 		for item in transaction:
 			itemDict[item] += 1
 
+	inputFile.close()
+
 	return transactionList, itemDict
 
 def getCandidateSet(freqSet, infreqSet, length):
-	cs = set([i.union(j) for i in freqSet for j in freqSet if len(i.union(j)) == length])
-	for index, candidate in enumerate(cs):
-		for c in combinations(candidate, length - 1):
-			if c in infreqSet:
-				del cs[index]
-
-	return cs
-
-def printAnswer(resultList):
-	for item in resultList:
-		print(" ".join(item[0]) + ' (%s)' % (item[1]))
+	return set([i.union(j) for i in freqSet for j in freqSet if len(i.union(j)) == length])
 
 def getFreqSetInfreqSet(itemDict, ms):
 	freqSet, infreqSet = set(), set()
@@ -57,14 +49,13 @@ def dbpruning(transactionList, infreqSet, length):
 	
 	return prunedList
 
+def writeAnswer(resultList, outputFile):
+	output = open(outputFile, 'w')
+	for item in resultList:
+		output.write(" ".join(item[0]) + ' (%s)\n' % (item[1]))
 
-def main():
-	t0 = time.time()
-	dataSet, ms = sys.argv[1:]
-	ms = int(ms)
-
-	transactionList, itemDict = getTransactionListAndItemSet(dataSet)
-	# freqSet = set(frozenset([i]) for i in itemDict if itemDict[i] >= ms)
+def apriori(dataSet, ms):
+	transactionList, itemDict = loadData(dataSet)
 	resultList = [(frozenset([i]),j) for i, j in itemDict.items() if j >= ms]
 
 	freqSet, infreqSet = getFreqSetInfreqSet(itemDict, ms)
@@ -87,10 +78,22 @@ def main():
 
 		resultList += [(i,j) for i, j in localDict.items() if j >= ms]
 		freqSet, infreqSet = getFreqSetInfreqSet(localDict, ms)
-		transactionList = dbpruning(transactionList, infreqSet, length)
 		length += 1
 
-	printAnswer(resultList)
+	return resultList
+
+def main():
+	t0 = time.time()
+	if (len(sys.argv) < 3):
+		print("You need to type the inputFileName, minimum support and outputFileName on command line")
+		sys.exit()
+
+	dataSet, ms, outputFile = sys.argv[1:]
+	ms = int(ms)
+
+	resultList = apriori(dataSet, ms)
+
+	writeAnswer(resultList, outputFile)
 
 	t1 = time.time()
 	print("The program runs for %.2f seconds" % (t1-t0))
