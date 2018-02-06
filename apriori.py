@@ -1,3 +1,8 @@
+# Emory University CS378
+# Homework 1
+# Yicheng (Jason) Wang
+# NetId: ywan693
+
 import sys
 import time
 from collections import defaultdict
