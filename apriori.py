@@ -22,7 +22,7 @@ def loadData(dataSet):
 
 	return transactionList, itemDict
 
-def getCandidateSet(freqSet, infreqSet, length):
+def getCandidateSet(freqSet, length):
 	return set([i.union(j) for i in freqSet for j in freqSet if len(i.union(j)) == length])
 
 def getFreqSetInfreqSet(itemDict, ms):
@@ -63,7 +63,7 @@ def apriori(dataSet, ms):
 	length = 2
 
 	while freqSet:
-		candidateSet = getCandidateSet(freqSet, infreqSet, length)	
+		candidateSet = getCandidateSet(freqSet,length)	
 		localDict = defaultdict(int)
 
 		if not transactionList:
@@ -76,8 +76,7 @@ def apriori(dataSet, ms):
 					localDict[c] += 1
 
 		resultList += [(i,j) for i, j in localDict.items() if j >= ms]
-		freqSet, infreqSet = getFreqSetInfreqSet(localDict, ms)
-		# transactionList = dbpruning(transactionList, infreqSet, length)
+		freqSet = [i for i,j in localDict.items() if j >= ms]
 		length += 1
 
 	return resultList
