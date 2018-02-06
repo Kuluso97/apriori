@@ -1,6 +1,4 @@
-# Project Title
-
-Apriori Algorithm Implementation (Python)
+# Apriori Algorithm Implementation (Python)
 
 ## Getting Started
 
@@ -16,7 +14,7 @@ To run the test or test the code on any data, please type the following command 
 ```
 python(or python3) apriori.py (name of your test file) (minimum support) (outputfileName)
 ```
-### Break down into end to end tests
+### Test results
 
 For the CS378 homework, the code performance on these three cases are as follow:
 
