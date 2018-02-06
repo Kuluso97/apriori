@@ -17,9 +17,8 @@ def loadData(dataSet):
 		transaction = frozenset(line.split())
 		transactionList.append(transaction)
 		for item in transaction:
+			item = frozenset([item])
 			itemDict[item] += 1
-
-	inputFile.close()
 
 	return transactionList, itemDict
 
@@ -30,9 +29,9 @@ def getFreqSetInfreqSet(itemDict, ms):
 	freqSet, infreqSet = set(), set()
 	for i,j in itemDict.items():
 		if j >= ms:
-			freqSet.add(frozenset([i]))
+			freqSet.add(i)
 		else:
-			infreqSet.add(frozenset([i]))
+			infreqSet.add(i)
 
 	return freqSet, infreqSet
 
@@ -56,7 +55,7 @@ def writeAnswer(resultList, outputFile):
 
 def apriori(dataSet, ms):
 	transactionList, itemDict = loadData(dataSet)
-	resultList = [(frozenset([i]),j) for i, j in itemDict.items() if j >= ms]
+	resultList = [(i,j) for i, j in itemDict.items() if j >= ms]
 
 	freqSet, infreqSet = getFreqSetInfreqSet(itemDict, ms)
 	transactionList = dbpruning(transactionList, infreqSet, 1)
@@ -64,7 +63,7 @@ def apriori(dataSet, ms):
 	length = 2
 
 	while freqSet:
-		candidateSet = getCandidateSet(freqSet, infreqSet, length)
+		candidateSet = getCandidateSet(freqSet, infreqSet, length)	
 		localDict = defaultdict(int)
 
 		if not transactionList:
@@ -78,13 +77,14 @@ def apriori(dataSet, ms):
 
 		resultList += [(i,j) for i, j in localDict.items() if j >= ms]
 		freqSet, infreqSet = getFreqSetInfreqSet(localDict, ms)
+		# transactionList = dbpruning(transactionList, infreqSet, length)
 		length += 1
 
 	return resultList
 
 def main():
 	t0 = time.time()
-	if (len(sys.argv) < 3):
+	if (len(sys.argv) < 4):
 		print("You need to type the inputFileName, minimum support and outputFileName on command line")
 		sys.exit()
 
