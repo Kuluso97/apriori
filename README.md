@@ -22,9 +22,9 @@ For the CS378 homework, the code performance on these three cases are as follow:
 
 ```
 minimum count		performance
-2000				1.98s
-1000				4.56s
-500					8.80s
+2000			1.98s
+1000			4.56s
+500			8.80s
 ```
 
 ## Authors
