@@ -21,9 +21,9 @@ python(or python3) apriori.py (name of your test file) (minimum support) (output
 For the CS378 homework, the code performance on these three cases are as follow:
 
 minimum count       performance
-2000				3s
-1000				20s
-500					160s
+2000				1.98s
+1000				4.56s
+500					8.80s
 
 ## Authors
 

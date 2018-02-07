@@ -25,28 +25,15 @@ def loadData(dataSet):
 def getCandidateSet(freqSet, length):
 	return set([i.union(j) for i in freqSet for j in freqSet if len(i.union(j)) == length])
 
-def getFreqSetInfreqSet(itemDict, ms):
-	freqSet, infreqSet = set(), set()
-	for i,j in itemDict.items():
-		if j >= ms:
-			freqSet.add(i)
-		else:
-			infreqSet.add(i)
+def getFreqUnionSet(freqSet):
+	freqUnionSet = set()
+	for i in freqSet:
+		freqUnionSet = freqUnionSet.union(i)
+	return freqUnionSet
 
-	return freqSet, infreqSet
-
-def dbpruning(transactionList, infreqSet, length):
-	prunedList = []
+def dbpruning(transactionList, freqSet):
 	for i, transaction in enumerate(transactionList):
-		for c in combinations(transaction, length):
-			c = frozenset(list(c))
-			if c in infreqSet:
-				transactionList[i] -=  c
-			
-		if transactionList[i]:
-			prunedList.append(transactionList[i])
-	
-	return prunedList
+		transactionList[i] = transaction & freqSet
 
 def writeAnswer(resultList, outputFile):
 	output = open(outputFile, 'w')
@@ -55,20 +42,19 @@ def writeAnswer(resultList, outputFile):
 
 def apriori(dataSet, ms):
 	transactionList, itemDict = loadData(dataSet)
-	resultList = [(i,j) for i, j in itemDict.items() if j >= ms]
 
-	freqSet, infreqSet = getFreqSetInfreqSet(itemDict, ms)
-	transactionList = dbpruning(transactionList, infreqSet, 1)
+	resultList = [(i,j) for i, j in itemDict.items() if j >= ms]
+	freqSet = [i for i,j in itemDict.items() if j >= ms]
+
+	freqUnionSet = getFreqUnionSet(freqSet)
+	dbpruning(transactionList, freqUnionSet)
 
 	length = 2
 
 	while freqSet:
 		candidateSet = getCandidateSet(freqSet,length)	
 		localDict = defaultdict(int)
-
-		if not transactionList:
-			break
-
+		
 		for transaction in transactionList:
 			for c in combinations(transaction, length):
 				c = frozenset(list(c))
@@ -77,6 +63,8 @@ def apriori(dataSet, ms):
 
 		resultList += [(i,j) for i, j in localDict.items() if j >= ms]
 		freqSet = [i for i,j in localDict.items() if j >= ms]
+		freqUnionSet = getFreqUnionSet(freqSet)
+		dbpruning(transactionList, freqUnionSet)
 		length += 1
 
 	return resultList
