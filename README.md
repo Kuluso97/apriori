@@ -30,5 +30,3 @@ minimum count		performance
 ## Authors
 
 * **Jason Wang** - *Initial work* - [apriori](https://github.com/Kuluso97/apriori)
-
-
